@@ -127,3 +127,55 @@ Server:
         }
     ]
 }
+
+
+Client:
+{
+    'action': 'shot',
+    'player_uuid': player_uuid,
+    'shot': {
+        'x': 0,
+        'y': 0
+    }
+}
+Server:
+{
+    'action': 'shot',
+    'status': 'ok'
+}
+
+
+
+Client:
+{
+    'action': 'get_shots'
+}
+Server:
+{
+    'action': 'get_shots',
+    'shots': [
+        {
+            'type': 'miss',
+            'coord: {
+                'x': 0,
+                'y': 0
+            }
+        },
+         {
+            'type': 'hit',
+            'color': '',
+            'coord: {
+                'x': 0,
+                'y': 0
+            }
+        },
+        {
+            'type': destroy,
+            'color': '',
+            'coord: {
+                'x': 0,
+                'y': 0
+            }
+        }
+    ]
+}

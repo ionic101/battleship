@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battleship</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1e3a8a;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        .title {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .input-field {
+            margin-bottom: 20px;
+        }
+        .input-field input {
+            padding: 10px;
+            font-size: 1em;
+            width: 200px;
+        }
+        .join-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .join-button:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">Battleship</div>
+        <div class="input-field">
+            <input type="text" id="nickname" placeholder="Enter your nickname">
+        </div>
+        <button class="join-button" onclick="joinGame()">Join</button>
+    </div>
+    <script>
+        function joinGame() {
+            const nickname = document.getElementById('nickname').value;
+            if (!nickname) {
+                alert('Необходимо ввести никнейм');
+                return;
+            }
+
+            document.cookie = `nickname=${nickname}; path=/`;
+
+            const currentUrl = window.location.href;
+            let gameUuid = null;
+
+            if (currentUrl.includes('/join/')) {
+                gameUuid = currentUrl.split('/join/')[1];
+                document.cookie = `is_host=false; path=/`;
+                connectWebSocket(gameUuid);
+            } else {
+                fetch('http://localhost:8000/game/create', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        gameUuid = data.game_uuid;
+                        document.cookie = `is_host=true; path=/`;
+                        connectWebSocket(gameUuid);
+                    }
+                });
+            }
+        }
+
+        function connectWebSocket(gameUuid) {
+            const ws = new WebSocket(`ws://localhost:8000/ws/${gameUuid}`);
+            ws.onopen = () => {
+                ws.send(JSON.stringify({ action: 'get_status' }));
+            };
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                if (message.action === 'get_status' && message.status === 'free') {
+                    document.cookie = `game_uuid=${gameUuid}; path=/`;
+                    window.location.href = '/lobby';
+                } else {
+                    alert(message.status);
+                }
+            };
+        }
+    </script>
+</body>
+</html>

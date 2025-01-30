@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Click Circles</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(30, 1fr);
+            grid-template-rows: repeat(30, 1fr);
+            width: 90vmin;
+            height: 90vmin;
+            gap: 0;
+            background-color: #ccc;
+        }
+
+        .cell {
+            background-color: white;
+            border: 1px solid #ddd;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .cell:hover {
+            background-color: lightgray;
+        }
+
+        .circle {
+            width: 40%;
+            height: 40%;
+            background-color: black;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cell.clicked {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid" id="grid"></div>
+
+    <script>
+        const gameUuid = getCookie('game_uuid');
+        const playerUuid = getCookie('player_uuid');
+        const ws = new WebSocket(`ws://localhost:8000/ws/${gameUuid}`);
+
+        ws.onopen = () => {
+            ws.send(JSON.stringify({ action: 'rejoin_game', player_uuid: playerUuid }));
+        };
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            if (message.action === 'rejoin_game' && message.status === 'ok') {
+                ws.send(JSON.stringify({ action: 'get_ships', player_uuid: playerUuid }));
+            } else if (message.action === 'get_ships' && message.status === 'ok') {
+                displayShips(message.ships);
+            }
+        };
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function displayShips(ships) {
+            ships.forEach(ship => {
+                const { x, y } = ship.coord;
+                const size = ship.size;
+                const isVertical = ship.is_vertical;
+                const color = ship.color;
+
+                for (let i = 0; i < size; i++) {
+                    const cellIndex = isVertical ? (x + i) * 30 + y : x * 30 + (y + i);
+                    const cell = document.querySelector(`.grid .cell:nth-child(${cellIndex + 1})`);
+                    if (cell) {
+                        cell.style.backgroundColor = color;
+                    }
+                }
+            });
+        }
+
+        const grid = document.getElementById('grid');
+
+        // Create 30x30 grid cells
+        for (let i = 0; i < 900; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+
+            cell.addEventListener('click', () => {
+                if (!cell.classList.contains('clicked')) {
+                    const circle = document.createElement('div');
+                    circle.className = 'circle';
+                    cell.appendChild(circle);
+                    cell.classList.add('clicked');
+                }
+            });
+
+            grid.appendChild(cell);
+        }
+    </script>
+</body>
+</html>

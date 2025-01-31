@@ -2,6 +2,7 @@ from battleship.models.ship import Ship
 from battleship.models.coord import Coord
 from battleship.models.shot_type import ShotType
 from battleship.models.player import Player
+from battleship.models.shot_info import ShotInfo
 from random import choice
 
 
@@ -107,3 +108,14 @@ class Board:
     
     def get_player_ships(self, player: Player) -> list[Ship]:
         return list(filter(lambda ship: ship.player == player, self.ships))
+
+    def shot(self, coord: Coord) -> ShotInfo:
+        if coord in self.ships_coords:
+            self.ships_coords[coord].lifes -= 1
+            if self.ships_coords[coord].lifes == 0:
+                self.shots[coord] = ShotType.DESTROY
+            else:
+                self.shots[coord] = ShotType.HIT
+        else:
+            self.shots[coord] = ShotType.MISS
+        return ShotInfo(self.shots[coord], self.ships_coords[coord] if coord in self.ships_coords else None)

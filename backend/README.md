@@ -133,7 +133,7 @@ Client:
 {
     'action': 'shot',
     'player_uuid': player_uuid,
-    'shot': {
+    'shot_coord': {
         'x': 0,
         'y': 0
     }
@@ -142,6 +142,11 @@ Server:
 {
     'action': 'shot',
     'status': 'ok'
+}
+{
+    'action': 'shot',
+    'status': 'error',
+    'message': 'Player with uuid can't move now'
 }
 
 
@@ -163,19 +168,70 @@ Server:
         },
          {
             'type': 'hit',
-            'color': '',
+            'color': '#8A2BE2',
             'coord: {
                 'x': 0,
                 'y': 0
             }
         },
         {
-            'type': destroy,
-            'color': '',
+            'type': 'destroy',
+            'color': '#BFFF00',
             'coord: {
                 'x': 0,
                 'y': 0
             }
         }
     ]
+}
+
+
+
+Server:
+{
+    'action': 'new_shot',
+    'shot': {
+        'type': 'miss',
+        'coord: {
+            'x': 0,
+            'y': 0
+        }
+    }
+}
+{
+    'action': 'new_shot',
+    'shot': {
+        'type': 'hit',
+        'color': '#8A2BE2',
+        'coord: {
+            'x': 0,
+            'y': 0
+        }
+    }
+}
+{
+    'action': 'new_shot',
+    'shot': {
+        'type': 'destroy',
+        'color': '#BFFF00',
+        'coord: {
+            'x': 0,
+            'y': 0
+        }
+    }
+}
+
+
+
+Client:
+{
+    'action': 'who_move'
+}
+Server:
+{
+    'action': 'who_move',
+    'player': {
+        'username': 'player1',
+        'color': '#BFFF00'
+    }
 }

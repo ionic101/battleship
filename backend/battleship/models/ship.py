@@ -8,3 +8,4 @@ class Ship:
         self.coord: Coord = coord
         self.size: int = size
         self.is_vertical: bool = is_vertical
+        self.lifes: int = size

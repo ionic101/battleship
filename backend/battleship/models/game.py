@@ -8,6 +8,7 @@ from battleship.models.ship import Ship
 from battleship.models.game_status import GameStatus
 from battleship.models.board import Board
 from battleship.models.colors import Colors
+from battleship.models.coord import Coord
 from random import randint
 
 
@@ -21,6 +22,7 @@ class Game:
     def start(self) -> None:
         self.status = GameStatus.IN_GAME
         self.board: Board = Board(self.players)
+        self.who_move_index: int = 0
 
     def stop(self) -> None:
         pass
@@ -37,6 +39,15 @@ class Game:
             if player.uuid == player_uuid:
                 return player
         return None
+    
+    def get_who_move(self) -> Player:
+        return self.players[self.who_move_index]
+    
+    def player_move(self) -> None:
+        self.who_move_index += 1
+        if self.who_move_index >= len(self.players):
+            self.who_move_index = 0
+        for player in pla
     
     def reconnect_player(self, player_uuid: UUID, new_websocket: WebSocket) -> None:
         player: Player | None = self.get_player_by_uuid(player_uuid)

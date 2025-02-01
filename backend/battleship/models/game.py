@@ -43,11 +43,17 @@ class Game:
     def get_who_move(self) -> Player:
         return self.players[self.who_move_index]
     
-    def player_move(self) -> None:
+    async def player_move(self) -> None:
         self.who_move_index += 1
         if self.who_move_index >= len(self.players):
             self.who_move_index = 0
-        for player in pla
+        player: Player = self.get_who_move()
+        
+        await self.broadcast(
+            {'action': 'who_move',
+                'player': {
+                'username': player.username,
+                'color': player.color.value}})
     
     def reconnect_player(self, player_uuid: UUID, new_websocket: WebSocket) -> None:
         player: Player | None = self.get_player_by_uuid(player_uuid)

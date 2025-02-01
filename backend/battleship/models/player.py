@@ -9,4 +9,4 @@ class Player:
         self.uuid: UUID = uuid4()
         self.websocket: WebSocket = websocket
         self.username: str = username
-        self.color: Colors = Colors.BLACK
+        self.color: Colors = Colors.AZURE

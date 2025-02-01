@@ -62,7 +62,7 @@ size_to_count_ships: dict[int, dict[int, int]] = {
 }
 start_coord: Coord = Coord(0, 0)
 end_coord: Coord = Coord(29, 29)
-offset_coords: list[Coord] = [Coord(dx, dy) for dx in range(-1, 2) for dy in range(-1, 2) if not (dx == dy == 0)]
+offset_coords: list[Coord] = [Coord(dx, dy) for dx in range(-1, 2) for dy in range(-1, 2)]
 
 
 class Board:
@@ -118,4 +118,4 @@ class Board:
                 self.shots[coord] = ShotType.HIT
         else:
             self.shots[coord] = ShotType.MISS
-        return ShotInfo(self.shots[coord], self.ships_coords[coord] if coord in self.ships_coords else None)
+        return ShotInfo(self.shots[coord], coord, self.ships_coords[coord] if coord in self.ships_coords else None)

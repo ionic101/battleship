@@ -8,6 +8,8 @@ from battleship.models.game_status import GameStatus
 from battleship.models.ship import Ship
 from battleship.models.shot_type import ShotType
 from battleship.models.coord import Coord
+from battleship.models.shot_info import ShotInfo
+from battleship.schemas.is_can_move import IsCanMoveScheme
 
 from typing import TypeVar
 
@@ -104,8 +106,32 @@ async def get_field(field_scheme: type[T], websocket: WebSocket, data: dict[str,
         await send_error(websocket, data['action'], e.errors()[0]['msg'])
 
 
-def get_response_shot_data(shot: ShotScheme) -> dict[str, Any]:
-
+def get_response_shot_data(shot: ShotInfo) -> dict[str, Any]:
+    response: dict[str, Any] = {}
+    match shot.type:
+        case ShotType.MISS:
+            response['type'] = 'miss'
+            response['coord'] = {
+                'x': shot.coord.x,
+                'y': shot.coord.y,
+            }
+        case ShotType.HIT:
+            response['type'] = 'hit'
+            response['coord'] = {
+                'x': shot.coord.x,
+                'y': shot.coord.y,
+            }
+            if shot.ship is not None:
+                response['color'] = shot.ship.player.color.value
+        case ShotType.DESTROY:
+            response['type'] = 'destroy'
+            response['coord'] = {
+                'x': shot.coord.x,
+                'y': shot.coord.y,
+            }
+            if shot.ship is not None:
+                response['color'] = shot.ship.player.color.value
+    return response
 
 
 async def shot(websocket: WebSocket, game: Game, data: dict[str, Any]) -> None:
@@ -117,13 +143,14 @@ async def shot(websocket: WebSocket, game: Game, data: dict[str, Any]) -> None:
     if shot_data.player_uuid != who_move.uuid:
         await send_error(websocket, 'shot', f'Player with uuid {shot_data.player_uuid} can\'t move now')
 
-    if shot_data.shot_coord in game.board.shots:
+    if Coord(**shot_data.shot_coord.model_dump()) in game.board.shots:
         await send_error(websocket, 'shot', f'Cell is not available for shot')
     
-    game.board.shot(Coord(**shot_data.shot_coord.model_dump()))
-    game.player_move()
+    shot_info: ShotInfo = game.board.shot(Coord(**shot_data.shot_coord.model_dump()))
+    if shot_info.type == ShotType.MISS:
+        await game.player_move()
     await websocket.send_json({'action': 'shot', 'status': 'ok'})
-    await game.broadcast({'new_shot': 'shot', 'status': 'ok'})
+    await game.broadcast(get_response_shot_data(shot_info))
 
 @ws_router.websocket('/{lobby_id}')
 async def websocket_endpoint(websocket: WebSocket, lobby_id: UUID):
@@ -175,11 +202,20 @@ async def websocket_endpoint(websocket: WebSocket, lobby_id: UUID):
                         'action': 'who_move',
                         'player': {
                             'username': player.username,
-                            'color': player.color
+                            'color': player.color.value
                         }
                     })
                 case 'shot':
                     await shot(websocket, game, data)
+                case 'is_can_move':
+                    is_can_move_data: IsCanMoveScheme | None = await get_field(IsCanMoveScheme, websocket, data)
+                    if is_can_move_data is None:
+                        continue
+                    player: Player = game.get_who_move()
+                    await websocket.send_json({
+                        'action': 'is_can_move',
+                        'can_move': player.uuid == is_can_move_data.player_uuid
+                    })
                     
     except WebSocketDisconnect:
         print(f"Client disconnected from lobby {lobby_id}")

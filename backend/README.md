@@ -235,3 +235,15 @@ Server:
         'color': '#BFFF00'
     }
 }
+
+
+Client:
+{
+    'action': 'is_can_move',
+    'player_uuid': player_uuid
+}
+Server:
+{
+    'action': 'is_can_move',
+    'can_move': true
+}

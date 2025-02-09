@@ -20,7 +20,6 @@ class Manager:
     def create_game(self) -> Game:
         lobby: Game = Game()
         self.lobbies[lobby.uuid] = lobby
-        print(self.lobbies)
         return lobby
     
     def find_game(self, uuid: UUID) -> Game | None:

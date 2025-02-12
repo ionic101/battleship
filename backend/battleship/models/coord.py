@@ -1,10 +1,10 @@
 from random import randint
+from dataclasses import dataclass
 
-
+@dataclass
 class Coord:
-    def __init__(self, x: int, y: int) -> None:
-        self.x: int = x
-        self.y: int = y
+    x: int
+    y: int
 
     def __add__(self, other):
         if isinstance(other, Coord):

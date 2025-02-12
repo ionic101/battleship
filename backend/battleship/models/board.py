@@ -110,6 +110,8 @@ class Board:
         return list(filter(lambda ship: ship.player == player, self.ships))
 
     def shot(self, coord: Coord) -> ShotInfo:
+        if coord in self.shots:
+            return ShotInfo(self.shots[coord], coord, self.ships_coords[coord] if coord in self.ships_coords else None)
         if coord in self.ships_coords:
             self.ships_coords[coord].lifes -= 1
             if self.ships_coords[coord].lifes == 0:

@@ -49,9 +49,10 @@ Server:
     "status": "error",
     "message": "message"
 }
+```
 
-
-
+#### Получение списка игроков
+```
 Client:
 {
     "action": "get_players"
@@ -59,6 +60,7 @@ Client:
 Server:
 {
     "action": "get_players",
+    "status": "ok",
     "players": [
         {
             "username": "player1",
@@ -70,9 +72,9 @@ Server:
         }
     ]
 }
+```
 
-
-
+```
 Client:
 {
     "action": "start_game"
@@ -96,6 +98,7 @@ Server:
 
 
 #### Игра
+```
 Client:
 {
     "action": "rejoin_game",
@@ -116,8 +119,10 @@ Server:
     "action": "rejoin_game",
     "status": "ok"
 }
+```
 
-
+#### Получение списка кораблей
+```
 Client:
 {
     "action": "get_ships",
@@ -139,7 +144,7 @@ Server:
         }
     ]
 }
-
+```
 
 Client:
 {

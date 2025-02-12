@@ -1,6 +1,5 @@
 from pydantic import BaseModel, field_validator
-from battleship.models.colors import Colors
-from uuid import UUID
+
 from battleship.utils.config import config
 
 

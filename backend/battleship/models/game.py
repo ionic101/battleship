@@ -55,12 +55,6 @@ class Game:
                 'username': player.username,
                 'color': player.color.value}})
     
-    def reconnect_player(self, player_uuid: UUID, new_websocket: WebSocket) -> None:
-        player: Player | None = self.get_player_by_uuid(player_uuid)
-        if player is None:
-            return None
-        player.websocket = new_websocket
-    
     async def broadcast(self, data: dict[str, Any]) -> None:
         for player in self.players:
             await player.websocket.send_json(data)

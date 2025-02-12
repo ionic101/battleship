@@ -10,7 +10,6 @@ from battleship.actions.start_game import action_start_game
 from battleship.actions.who_move import action_who_move
 
 
-
 __all__ = [
     'action_get_players',
     'action_get_ships',

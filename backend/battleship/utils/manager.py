@@ -1,6 +1,5 @@
 from uuid import UUID
 
-
 from battleship.models.game import Game
 from battleship.models.game import Game
 

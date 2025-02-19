@@ -61,5 +61,6 @@ action_to_func: dict[str, Callable[..., Awaitable[None]]] = {
     'get_shots': action_get_shots,
     'who_move': action_who_move,
     'shot': action_shot,
-    'is_can_move': action_is_can_move
+    'is_can_move': action_is_can_move,
+    'get_players_stats': action_get_players_stats
 }

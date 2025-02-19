@@ -47,7 +47,6 @@ async def action_shot(websocket: WebSocket, game: Game, data: dict[str, Any], **
         await game.player_move()
     await websocket.send_json({'action': 'shot', 'status': 'ok'})
     await game.broadcast(get_response_shot_data(shot_info))
-
     
     if shot_info.type == ShotType.DESTROY and shot_info.ship is not None:
         shots: list[ShotInfo] = []

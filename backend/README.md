@@ -264,3 +264,29 @@ Server:
     "action": "is_can_move",
     "can_move": true
 }
+
+#### Получение статистики игроков
+Client:
+```
+{
+    "action": "get_players_stats"
+}
+```
+Server:
+{
+    "action: "get_players_stats",
+    "stats": {
+        "player1": {
+            "1": 3,
+            "2": 0,
+            "3": 1,
+            "4": 1
+        },
+        "player2": {
+            "1": 2,
+            "2": 3,
+            "3": 2,
+            "4": 0
+        }
+    }
+}

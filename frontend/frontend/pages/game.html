@@ -86,6 +86,30 @@
         #current-player .label {
             color: black;
         }
+
+        #game-stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: 0.9em;
+            color: black;
+        }
+
+        .player-stats {
+            margin-bottom: 10px;
+        }
+
+        .player-stats .dead {
+            text-decoration: line-through;
+        }
+
+        .player-stats .zero {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -94,6 +118,7 @@
         <div id="player-name"></div>
     </div>
     <div class="grid" id="grid"></div>
+    <div id="game-stats"></div>
 
     <script>
         const gameUuid = getCookie('game_uuid');
@@ -122,12 +147,15 @@
                 displayShots(message.shots);
             } else if (message.action === 'new_shot') {
                 displayShot(message.shot);
+                ws.send(JSON.stringify({ action: 'get_players_stats' }));
             } else if (message.type === 'miss') {
                 displayShot(message);
             } else if (message.type === 'hit') {
                 displayShot(message);
             } else if (message.type === 'destroy') {
                 displayShot(message);
+            } else if (message.action === 'get_players_stats') {
+                displayPlayerStats(message.stats);
             }
         };
 
@@ -186,6 +214,34 @@
                     cross.className = 'cross';
                     cell.appendChild(cross);
                 }
+            }
+        }
+
+        function displayPlayerStats(stats) {
+            const gameStatsDiv = document.getElementById('game-stats');
+            gameStatsDiv.innerHTML = '';
+
+            for (const [player, ships] of Object.entries(stats)) {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'player-stats';
+                playerDiv.textContent = player;
+
+                let allZero = true;
+                const shipStats = ['4П', '3П', '2П', '1П'].map((type, index) => {
+                    const count = ships[4 - index] || 0;
+                    if (count === 0) {
+                        allZero = false;
+                        return `<span class="zero">${type}x${count}</span>`;
+                    }
+                    return `${type}x${count}`;
+                }).join('; ');
+
+                if (allZero) {
+                    playerDiv.classList.add('dead');
+                }
+
+                playerDiv.innerHTML += `: ${shipStats}`;
+                gameStatsDiv.appendChild(playerDiv);
             }
         }
 

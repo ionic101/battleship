@@ -8,6 +8,7 @@ from battleship.actions.rejoin_game import action_rejoin_game
 from battleship.actions.shot import action_shot
 from battleship.actions.start_game import action_start_game
 from battleship.actions.who_move import action_who_move
+from battleship.actions.get_players_stats import action_get_players_stats
 
 
 __all__ = [
@@ -20,5 +21,6 @@ __all__ = [
     'action_rejoin_game',
     'action_shot',
     'action_start_game',
-    'action_who_move'
+    'action_who_move',
+    'action_get_players_stats'
 ]

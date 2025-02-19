@@ -1,6 +1,7 @@
 from random import randint
 from dataclasses import dataclass
 
+
 @dataclass
 class Coord:
     x: int

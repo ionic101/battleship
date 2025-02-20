@@ -25,6 +25,11 @@
             background-color: #ccc;
             margin-top: 20px; /* Adjust margin to ensure equal spacing */
             margin-bottom: 20px; /* Add margin to create a gap at the bottom */
+            border: 5px solid transparent; /* Static border */
+        }
+
+        .grid.can-move {
+            border-color: #DAA520; /* Dark golden color */
         }
 
         .cell {
@@ -110,6 +115,18 @@
         .player-stats .zero {
             color: red;
         }
+
+        #turn-message {
+            position: absolute;
+            left: 70px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 200px;
+            text-align: center;
+            font-size: 1.6em;
+            color: black;
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
@@ -119,6 +136,7 @@
     </div>
     <div class="grid" id="grid"></div>
     <div id="game-stats"></div>
+    <div id="turn-message"></div>
 
     <script>
         const gameUuid = getCookie('game_uuid');
@@ -135,6 +153,7 @@
             const message = JSON.parse(event.data);
             if (message.action === 'rejoin_game' && message.status === 'ok') {
                 ws.send(JSON.stringify({ action: 'get_ships', player_uuid: playerUuid }));
+                ws.send(JSON.stringify({ action: 'get_players_stats' }));
             } else if (message.action === 'get_ships' && message.status === 'ok') {
                 displayShips(message.ships);
             } else if (message.action === 'who_move') {
@@ -143,6 +162,7 @@
             } else if (message.action === 'is_can_move') {
                 canMove = message.can_move;
                 updateCellHoverState();
+                updateTurnMessage();
             } else if (message.action === 'get_shots' && message.status === 'ok') {
                 displayShots(message.shots);
             } else if (message.action === 'new_shot') {
@@ -221,14 +241,18 @@
             const gameStatsDiv = document.getElementById('game-stats');
             gameStatsDiv.innerHTML = '';
 
-            for (const [player, ships] of Object.entries(stats)) {
+            for (const [player, data] of Object.entries(stats)) {
                 const playerDiv = document.createElement('div');
                 playerDiv.className = 'player-stats';
-                playerDiv.textContent = player;
+
+                const playerNameSpan = document.createElement('span');
+                playerNameSpan.textContent = player;
+                playerNameSpan.style.color = data.color;
+                playerDiv.appendChild(playerNameSpan);
 
                 let allZero = true;
                 const shipStats = ['4П', '3П', '2П', '1П'].map((type, index) => {
-                    const count = ships[4 - index] || 0;
+                    const count = data.ships[4 - index] || 0;
                     if (count === 0) {
                         allZero = false;
                         return `<span class="zero">${type}x${count}</span>`;
@@ -277,6 +301,23 @@
                     cell.classList.remove('can-move');
                 }
             });
+
+            if (canMove) {
+                grid.classList.add('can-move');
+            } else {
+                grid.classList.remove('can-move');
+            }
+        }
+
+        function updateTurnMessage() {
+            const turnMessageDiv = document.getElementById('turn-message');
+            if (canMove) {
+                turnMessageDiv.textContent = 'Сейчас ваш ход';
+                turnMessageDiv.style.color = '#DAA520'; /* Dark golden color */
+            } else {
+                turnMessageDiv.textContent = 'Ожидайте своего хода';
+                turnMessageDiv.style.color = 'gray';
+            }
         }
     </script>
 </body>
